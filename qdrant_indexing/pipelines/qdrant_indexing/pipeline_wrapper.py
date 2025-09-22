@@ -25,14 +25,13 @@ class PipelineWrapper(BasePipelineWrapper):
         if files:
             # Replace the writer with a new one pointing to the right collection
             document_store = QdrantDocumentStore(host="qdrant", index=collection_name)
-            self.pipeline.components["writer"] = DocumentWriter(document_store=document_store)
-
-            # indexing = Pipeline()
-            # indexing.add_component("converter", self.converter)
-            # indexing.add_component("embedder", self.embedder)
-            # indexing.add_component("writer", DocumentWriter(document_store=document_store))
-            # indexing.connect("converter", "embedder")
-            # indexing.connect("embedder", "writer")
+            
+            indexing = Pipeline()
+            indexing.add_component("converter", self.converter)
+            indexing.add_component("embedder", self.embedder)
+            indexing.add_component("writer", DocumentWriter(document_store=document_store))
+            indexing.connect("converter", "embedder")
+            indexing.connect("embedder", "writer")
 
             for file in files:
                 text = file.file.read().decode("utf-8")
