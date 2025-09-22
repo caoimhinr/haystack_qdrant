@@ -17,8 +17,8 @@ class PipelineWrapper(BasePipelineWrapper):
         self.pipeline = query
 
     def run_api(self, 
-        collection_name: str = "default", 
-        query: str) -> dict:
+        query: str,
+        collection_name: str = "default") -> dict:
         log.debug(f"Querying {collection_name} with: '{query}'")
 
         document_store = QdrantDocumentStore(
