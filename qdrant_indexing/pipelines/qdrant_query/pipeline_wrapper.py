@@ -17,7 +17,7 @@ class PipelineWrapper(BasePipelineWrapper):
         self.pipeline = query
 
     def run_api(self, 
-        query: str,
+        queryText: str,
         collection_name: str = "default") -> dict:
         log.debug(f"Querying {collection_name} with: '{query}'")
 
@@ -33,4 +33,4 @@ class PipelineWrapper(BasePipelineWrapper):
         )
         query.connect("embedder.embedding", "retriever.query_embedding")
 
-        return query.run({"embedder": {"text": query}})
+        return query.run({"embedder": {"text": queryText}})
