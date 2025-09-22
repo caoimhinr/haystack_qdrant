@@ -14,7 +14,7 @@ class PipelineWrapper(BasePipelineWrapper):
         indexing = Pipeline()
         indexing.add_component("converter", TextFileToDocument())
         indexing.add_component("embedder", SentenceTransformersDocumentEmbedder())
-        document_store = QdrantDocumentStore(host="qdrant")
+        document_store = QdrantDocumentStore(host="qdrant", collection_name=collection_name)
         indexing.add_component("writer", DocumentWriter(document_store=document_store))
         indexing.connect("converter", "embedder")
         indexing.connect("embedder", "writer")
