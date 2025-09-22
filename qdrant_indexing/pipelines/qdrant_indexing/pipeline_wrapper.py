@@ -11,13 +11,9 @@ from haystack_integrations.document_stores.qdrant import QdrantDocumentStore
 
 class PipelineWrapper(BasePipelineWrapper):
     def setup(self) -> None:
-        indexing = Pipeline()
-        indexing.add_component("converter", TextFileToDocument())
-        indexing.add_component("embedder", SentenceTransformersDocumentEmbedder())
-        document_store = QdrantDocumentStore(host="qdrant")
-        indexing.add_component("writer", DocumentWriter(document_store=document_store))
-        indexing.connect("converter", "embedder")
-        indexing.connect("embedder", "writer")
+        # we’ll store pipeline parts, but we’ll create the document store later per request
+        self.converter = TextFileToDocument()
+        self.embedder = SentenceTransformersDocumentEmbedder()
 
         self.pipeline = indexing
 
@@ -25,7 +21,13 @@ class PipelineWrapper(BasePipelineWrapper):
         if files:
             # Replace the writer with a new one pointing to the right collection
             document_store = QdrantDocumentStore(host="qdrant", index=collection_name)
-            self.pipeline.components["writer"] = DocumentWriter(document_store=document_store)
+            
+            indexing = Pipeline()
+            indexing.add_component("converter", self.converter)
+            indexing.add_component("embedder", self.embedder)
+            indexing.add_component("writer", DocumentWriter(document_store=document_store))
+            indexing.connect("converter", "embedder")
+            indexing.connect("embedder", "writer")
 
             for file in files:
                 text = file.file.read().decode("utf-8")
