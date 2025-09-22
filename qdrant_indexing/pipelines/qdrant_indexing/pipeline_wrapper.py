@@ -21,7 +21,7 @@ class PipelineWrapper(BasePipelineWrapper):
 
         self.pipeline = indexing
 
-    def run_api(self, files: Optional[List[UploadFile]] = None) -> dict:
+    def run_api(self, files: Optional[List[UploadFile]] = None, collection_name: str = "default") -> dict:
         if files:
             for file in files:
                 text = file.file.read().decode("utf-8")
