@@ -24,7 +24,7 @@ class PipelineWrapper(BasePipelineWrapper):
     def run_api(self, files: Optional[List[UploadFile]] = None, collection_name: str = "default") -> dict:
         if files:
             # Replace the writer with a new one pointing to the right collection
-            document_store = QdrantDocumentStore(host="qdrant", collection_name=collection_name)
+            document_store = QdrantDocumentStore(host="qdrant", index=collection_name)
             self.pipeline.components["writer"] = DocumentWriter(document_store=document_store)
 
             for file in files:
