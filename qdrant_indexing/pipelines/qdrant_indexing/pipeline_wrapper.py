@@ -14,7 +14,7 @@ class PipelineWrapper(BasePipelineWrapper):
         indexing = Pipeline()
         indexing.add_component("converter", TextFileToDocument())
         indexing.add_component("embedder", SentenceTransformersDocumentEmbedder())
-        document_store = QdrantDocumentStore(host="qdrant", collection_name=collection_name)
+        document_store = QdrantDocumentStore(host="qdrant")
         indexing.add_component("writer", DocumentWriter(document_store=document_store))
         indexing.connect("converter", "embedder")
         indexing.connect("embedder", "writer")
@@ -23,9 +23,13 @@ class PipelineWrapper(BasePipelineWrapper):
 
     def run_api(self, files: Optional[List[UploadFile]] = None, collection_name: str = "default") -> dict:
         if files:
+            # Replace the writer with a new one pointing to the right collection
+            document_store = QdrantDocumentStore(host="qdrant", collection_name=collection_name)
+            self.pipeline.components["writer"] = DocumentWriter(document_store=document_store)
+
             for file in files:
                 text = file.file.read().decode("utf-8")
-                log.debug(f"Indexing file: {file.filename}")
+                log.debug(f"Indexing file: {file.filename} into collection {collection_name}")
 
                 self.pipeline.run(
                     {"converter": {"sources": [ByteStream(text.encode())]}}
@@ -34,3 +38,4 @@ class PipelineWrapper(BasePipelineWrapper):
             log.debug("No files to index")
 
         return {"success": True}
+
