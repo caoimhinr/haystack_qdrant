@@ -39,7 +39,7 @@ class PipelineWrapper(BasePipelineWrapper):
                 text = file.file.read().decode("utf-8")
                 log.debug(f"Indexing file: {file.filename} into collection {collection_name}")
 
-                self.pipeline.run(
+                indexing.run(
                     {"converter": {"sources": [ByteStream(text.encode())]}}
                 )
         else:
