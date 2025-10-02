@@ -18,7 +18,8 @@ class PipelineWrapper(BasePipelineWrapper):
 
     def run_api(self, 
         queryText: str,
-        collection_name: str = "default") -> dict:
+        collection_name: str = "default",
+        top_k: int = 3) -> dict:
         log.debug(f"Querying {collection_name} with: '{queryText}'")
 
         document_store = QdrantDocumentStore(
@@ -29,7 +30,7 @@ class PipelineWrapper(BasePipelineWrapper):
         query = Pipeline()
         query.add_component("embedder", SentenceTransformersTextEmbedder())
         query.add_component(
-            "retriever", QdrantEmbeddingRetriever(document_store)
+            "retriever", QdrantEmbeddingRetriever(document_store, top_k=top_k)
         )
         query.connect("embedder.embedding", "retriever.query_embedding")
 
