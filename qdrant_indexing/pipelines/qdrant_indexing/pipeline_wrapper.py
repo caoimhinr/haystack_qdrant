@@ -26,7 +26,7 @@ class PipelineWrapper(BasePipelineWrapper):
             # Replace the writer with a new one pointing to the right collection
             document_store = QdrantDocumentStore(host="qdrant", 
             index=collection_name,
-            recreate_index=True)
+            recreate_index=False)
             
             indexing = Pipeline()
             indexing.add_component("converter", TextFileToDocument())
